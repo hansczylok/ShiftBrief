@@ -15,6 +15,8 @@ uvicorn app.main:app --reload
 
 Testseite: http://localhost:8000 · API-Doku: http://localhost:8000/docs
 
+In VS Code: Ordner öffnen, empfohlene Extensions installieren, `F5` → „Backend (uvicorn, Debug)“.
+
 Mit Docker: `docker compose up --build`
 
 ## Endpunkte
