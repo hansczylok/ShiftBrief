@@ -1,6 +1,6 @@
 """Gemma 4 wrapper (cloud only): Gemini API or a self-hosted Vertex AI endpoint.
 
-GEMMA_BACKEND=gemini (default) uses the Gemini API with GEMINI_API_KEY.
+GEMMA_BACKEND=gemini (default) uses the Gemini API with GEMMA_API_KEY.
 GEMMA_BACKEND=vertex uses a Model Garden endpoint (vLLM) at VERTEX_ENDPOINT_URL,
 authenticated via Application Default Credentials (gcloud auth application-default login).
 """
@@ -32,9 +32,9 @@ async def _ask_gemini(prompt: str, image: bytes | None, mime_type: str) -> str:
     from google import genai
     from google.genai import types
 
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GEMMA_API_KEY")
     if not api_key:
-        raise RuntimeError("GEMINI_API_KEY fehlt in .env")
+        raise RuntimeError("GEMMA_API_KEY fehlt in .env")
     client = genai.Client(api_key=api_key)
     parts: list = [prompt]
     if image:

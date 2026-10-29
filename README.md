@@ -25,7 +25,7 @@ Mit Docker: `docker compose up --build`
 
 | Wert | Wo | Braucht |
 |---|---|---|
-| `gemini` (Standard) | Gemini API | `GEMINI_API_KEY`, `GEMMA_MODEL` |
+| `gemini` (Standard) | Gemini API | `GEMMA_API_KEY`, `GEMMA_MODEL` |
 | `vertex` | eigener Vertex-AI-Endpoint (Model Garden, vLLM) | `VERTEX_ENDPOINT_URL`, `gcloud auth application-default login` |
 
 Die Endpoint-URL setzt sich aus `gcloud ai endpoints list --region=<REGION> --format="table(name.basename(),dedicatedEndpointDns)"` und der Projektnummer zusammen (Format siehe `.env.example`).
