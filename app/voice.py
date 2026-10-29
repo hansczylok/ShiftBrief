@@ -1,23 +1,21 @@
-"""ElevenLabs text-to-speech wrapper. Returns MP3 bytes."""
+"""ElevenLabs text-to-speech via the official SDK. Returns MP3 bytes.
+
+The SDK reads ELEVENLABS_API_KEY from the environment (loaded from .env in main.py).
+"""
 
 import os
 
-import httpx
+from elevenlabs.client import AsyncElevenLabs
 
 
 async def speak(text: str) -> bytes:
-    api_key = os.getenv("ELEVENLABS_API_KEY")
-    if not api_key:
+    if not os.getenv("ELEVENLABS_API_KEY"):
         raise RuntimeError("ELEVENLABS_API_KEY fehlt in .env")
-    voice_id = os.getenv("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb")
-    async with httpx.AsyncClient(timeout=60) as client:
-        r = await client.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
-            headers={"xi-api-key": api_key},
-            json={
-                "text": text,
-                "model_id": os.getenv("ELEVENLABS_MODEL", "eleven_multilingual_v2"),
-            },
-        )
-        r.raise_for_status()
-        return r.content
+    client = AsyncElevenLabs()
+    audio = client.text_to_speech.convert(
+        voice_id=os.getenv("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb"),
+        text=text,
+        model_id=os.getenv("ELEVENLABS_MODEL", "eleven_multilingual_v2"),
+        output_format="mp3_44100_128",
+    )
+    return b"".join([chunk async for chunk in audio])
