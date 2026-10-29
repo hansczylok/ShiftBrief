@@ -19,6 +19,20 @@ In VS Code: Ordner öffnen, empfohlene Extensions installieren, `F5` → „Back
 
 Mit Docker: `docker compose up --build`
 
+## Gemma-Backend wählen
+
+`GEMMA_BACKEND` in `.env` legt fest, wo Gemma 4 läuft:
+
+| Wert | Wo | Braucht |
+|---|---|---|
+| `gemini` (Standard) | Gemini API | `GEMINI_API_KEY`, `GEMMA_MODEL` |
+| `vertex` | eigener Vertex-AI-Endpoint (Model Garden, vLLM) | `VERTEX_ENDPOINT_URL`, `gcloud auth application-default login` |
+
+Die Endpoint-URL setzt sich aus `gcloud ai endpoints list --region=<REGION> --format="table(name.basename(),dedicatedEndpointDns)"` und der Projektnummer zusammen (Format siehe `.env.example`).
+Der Vertex-Endpoint kostet, solange ein Modell deployt ist – nach der Demo `gcloud ai endpoints undeploy-model …`.
+Beim Undeploy verschwindet auch der DNS-Name; nach erneutem Deploy die URL neu auslesen.
+`GEMMA_THINKING` gilt nur für `gemini`. Im Docker-Container gibt es kein gcloud-Login; `vertex` dort nur mit Service-Account-Key (`GOOGLE_APPLICATION_CREDENTIALS`).
+
 ## Endpunkte
 
 | Methode | Pfad | Input | Output |

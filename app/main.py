@@ -27,8 +27,10 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 async def health():
     return {
         "ok": True,
+        "gemma_backend": gemma.backend(),
         "gemma_model": os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it"),
         "gemini_key": bool(os.getenv("GEMINI_API_KEY")),
+        "vertex_endpoint": bool(os.getenv("VERTEX_ENDPOINT_URL")),
         "elevenlabs_key": bool(os.getenv("ELEVENLABS_API_KEY")),
     }
 
