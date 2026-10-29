@@ -10,7 +10,7 @@ import httpx
 
 SYSTEM_PROMPT = os.getenv(
     "SYSTEM_PROMPT",
-    "Du bist ein hilfreicher Assistent. Antworte knapp, klar und auf Deutsch.",
+    "You are a helpful assistant. Respond concisely, clearly, and in English.",
 )
 
 
@@ -40,7 +40,7 @@ async def _ask_gemini(prompt: str, image: bytes | None, mime_type: str) -> str:
         parts.append(types.Part.from_bytes(data=image, mime_type=mime_type))
 
     response = await client.aio.models.generate_content(
-        model=os.getenv("GEMMA_MODEL", "gemma-4-27b-it"),
+        model=os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it"),
         contents=parts,
     )
     return response.text or ""
