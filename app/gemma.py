@@ -1,12 +1,6 @@
-"""Gemma wrapper: Gemini API (default) or local Ollama (offline fallback).
+"""Gemma 4 wrapper via the Gemini API (cloud only)."""
 
-Switch with GEMMA_BACKEND=gemini|ollama in .env.
-"""
-
-import base64
 import os
-
-import httpx
 
 SYSTEM_PROMPT = os.getenv(
     "SYSTEM_PROMPT",
@@ -14,18 +8,8 @@ SYSTEM_PROMPT = os.getenv(
 )
 
 
-def _backend() -> str:
-    return os.getenv("GEMMA_BACKEND", "gemini").lower()
-
-
 async def ask(prompt: str, image: bytes | None = None, mime_type: str = "image/jpeg") -> str:
     """Send a text prompt (optionally with one image) to Gemma and return the answer text."""
-    if _backend() == "ollama":
-        return await _ask_ollama(prompt, image)
-    return await _ask_gemini(prompt, image, mime_type)
-
-
-async def _ask_gemini(prompt: str, image: bytes | None, mime_type: str) -> str:
     from google import genai
     from google.genai import types
 
@@ -48,21 +32,3 @@ async def _ask_gemini(prompt: str, image: bytes | None, mime_type: str) -> str:
         ),
     )
     return response.text or ""
-
-
-async def _ask_ollama(prompt: str, image: bytes | None) -> str:
-    message: dict = {"role": "user", "content": prompt}
-    if image:
-        message["images"] = [base64.b64encode(image).decode()]
-
-    async with httpx.AsyncClient(timeout=120) as client:
-        r = await client.post(
-            os.getenv("OLLAMA_URL", "http://localhost:11434") + "/api/chat",
-            json={
-                "model": os.getenv("OLLAMA_MODEL", "gemma3"),
-                "messages": [{"role": "system", "content": SYSTEM_PROMPT}, message],
-                "stream": False,
-            },
-        )
-        r.raise_for_status()
-        return r.json()["message"]["content"]

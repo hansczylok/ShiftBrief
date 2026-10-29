@@ -27,10 +27,6 @@ Mit Docker: `docker compose up --build`
 | POST | `/analyze` | multipart: `prompt` (Text), `image` (optional) | `{"answer": "..."}` |
 | POST | `/speak` | JSON: `{"text": "..."}` | `audio/mpeg` |
 
-## Offline-Fallback
-
-[Ollama](https://ollama.com) installieren, `ollama pull gemma3` (oder ein Gemma-4-Tag, falls verfügbar), dann in `.env` `GEMMA_BACKEND=ollama`.
-
 ## Lovable anbinden
 
 Lovable läuft im Browser und kommt nicht an `localhost`. Backend tunneln:
