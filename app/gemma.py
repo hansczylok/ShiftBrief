@@ -33,15 +33,19 @@ async def _ask_gemini(prompt: str, image: bytes | None, mime_type: str) -> str:
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY fehlt in .env")
     client = genai.Client(api_key=api_key)
-    # Gemma models on the Gemini API don't accept system_instruction, so the
-    # system prompt goes in front of the user prompt instead.
-    parts: list = [f"{SYSTEM_PROMPT}\n\n{prompt}"]
+    parts: list = [prompt]
     if image:
         parts.append(types.Part.from_bytes(data=image, mime_type=mime_type))
 
+    # Gemma 4 only knows thinking on/off: "high" = on, "minimal" = off.
+    thinking = os.getenv("GEMMA_THINKING", "false").lower() == "true"
     response = await client.aio.models.generate_content(
         model=os.getenv("GEMMA_MODEL", "gemma-4-26b-a4b-it"),
         contents=parts,
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            thinking_config=types.ThinkingConfig(thinking_level="high" if thinking else "minimal"),
+        ),
     )
     return response.text or ""
 
