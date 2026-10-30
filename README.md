@@ -1,6 +1,7 @@
 # ShiftBrief – Voice Shift Handover
 
 **Live app:** https://shiftbrief.lovable.app
+**Demo video (2 min):** [ShiftBrief.mp4](https://github.com/hansczylok/ShiftBrief/blob/main/ShiftBrief.mp4)
 
 A worker ending a shift dictates the handover. The next worker hears a 60-second personalized
 audio brief in their own language and gets a tappable checklist. Works for hospital wards,
@@ -21,6 +22,16 @@ Built in one afternoon at the **Hacktoberfest Hack Day Linz × Young AI Leaders 
    translated checklist persists ticks per person.
 
 German in, Turkish or English out, with room numbers, names and ticket numbers kept intact.
+
+## Screenshots
+
+| Incoming handovers | Record a handover | Extracted safety flags |
+|---|---|---|
+| ![Incoming](docs/screenshots/01-incoming.jpg) | ![Record](docs/screenshots/02-record.jpg) | ![Safety flags](docs/screenshots/03-extracted-safety-flags.jpg) |
+
+| Editable task list | Brief in Turkish (dictated in German) | Translated checklist |
+|---|---|---|
+| ![Tasks](docs/screenshots/04-extracted-tasks.jpg) | ![Turkish brief](docs/screenshots/05-brief-turkish.jpg) | ![Checklist](docs/screenshots/06-brief-turkish-checklist.jpg) |
 
 ## Stack
 
