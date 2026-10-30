@@ -61,11 +61,10 @@ No image generators were used.
 - **Built during the event (30 Oct 2026, from 14:00):** the idea decision, `SPEC.md`, the entire
   ShiftBrief application in Lovable (every screen, table, server route and prompt), testing and
   this README. The Lovable project was created at 14:27.
-- **Before the event (28–30 Oct, before 14:00):** the Python folder `app/` in this repository.
-  It is a small FastAPI warm-up we wrote while setting up accounts and API keys, to confirm that
-  Gemma 4 and ElevenLabs calls work from a laptop. **It is not part of the submitted product and
-  the live app does not use it.** We keep it in the repo because it shows how the same Gemma 4
-  prompts can run against a self-hosted Vertex AI endpoint instead of the Gemini API.
+- **Before the event (28–30 Oct, before 14:00):** a small FastAPI warm-up script we wrote while
+  setting up accounts and API keys, to confirm that Gemma 4 and ElevenLabs calls work from a
+  laptop. It was never part of the product and has been removed from the repository; it is
+  still visible in the git history before 30 Oct 14:00.
 
 ## What we learned
 
@@ -85,10 +84,7 @@ No image generators were used.
 |---|---|
 | `lovable-app/` | **The application source** exported from the Lovable project: TanStack Start + React 19 + Tailwind, Drizzle migration for the four tables, the five server routes under `src/routes/api/public/`, Gemma 4 prompts in `src/server/prompts.ts`, Gemini call with fallbacks in `src/server/ai.ts`. Secrets are not included; the routes read them from the environment. |
 | `docs/screenshots/` | Screenshots of the live app |
-| `ShiftBrief.mp4` | 2-minute demo recording |
 | `SPEC.md` | Full product specification: scope, personas, demo data, architecture, API contracts, Lovable prompt, Gemma prompts, risks |
-| `app/` | Pre-event warm-up backend (see timeline above): `/analyze` (Gemma 4, text + image), `/speak` (ElevenLabs TTS), Vertex AI switch |
-| `Dockerfile`, `docker-compose.yml` | Run the warm-up backend in a container |
 
 The application is developed in the Lovable project and deployed at the link above; `lovable-app/`
 is a snapshot of its source exported after the last change on 30 Oct 2026.
@@ -100,42 +96,18 @@ is a snapshot of its source exported after the last change on 30 Oct 2026.
 - **Peter Paul Kirschner** – [@petkir](https://github.com/petkir)
 - **Syed Alhaam Faridi**
 
-## Running the warm-up backend (optional, not part of the product)
+## Running the app locally
+
+The app is a Lovable project. To run the exported source yourself:
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate            # Windows (PowerShell: .venv\Scripts\Activate.ps1)
-pip install -r requirements.txt
-copy .env.example .env            # then fill in the keys
-uvicorn app.main:app --reload
+cd lovable-app
+bun install
+bun run dev
 ```
 
-Test page: http://localhost:8000 · API docs: http://localhost:8000/docs
-
-With Docker: `docker compose up --build`
-
-### Choosing where Gemma 4 runs
-
-`GEMMA_BACKEND` in `.env` selects the backend:
-
-| Value | Where | Needs |
-|---|---|---|
-| `gemini` (default) | Gemini API | `GEMMA_API_KEY`, `GEMMA_MODEL` |
-| `vertex` | your own Vertex AI endpoint (Model Garden, vLLM) | `VERTEX_ENDPOINT_URL`, `gcloud auth application-default login` |
-
-The endpoint URL is built from `gcloud ai endpoints list --region=<REGION> --format="table(name.basename(),dedicatedEndpointDns)"`
-and your project number (format in `.env.example`). A Vertex endpoint costs money while a model is
-deployed; undeploy after the demo with `gcloud ai endpoints undeploy-model …`. `GEMMA_THINKING`
-applies to `gemini` only. Inside Docker there is no gcloud login, so `vertex` needs a service-account
-key via `GOOGLE_APPLICATION_CREDENTIALS`.
-
-### Endpoints
-
-| Method | Path | Input | Output |
-|---|---|---|---|
-| GET | `/health` | – | which keys are set |
-| POST | `/analyze` | multipart: `prompt` (text), `image` (optional) | `{"answer": "..."}` |
-| POST | `/speak` | JSON: `{"text": "..."}` | `audio/mpeg` |
+Set `ELEVENLABS_API_KEY`, `GEMINI_API_KEY`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in the
+environment, and apply `drizzle/migrations/0000_migration.sql` to a Supabase project.
 
 ## License
 
