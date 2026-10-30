@@ -32,19 +32,51 @@ German in, Turkish or English out, with room numbers, names and ticket numbers k
 | Reasoning, extraction, translation | **Gemma 4** (`gemma-4-26b-a4b-it`, open weights) via the Gemini API |
 
 Gemma 4 is the core of the product: every task, safety flag, translation and spoken script comes
-from it. Because the weights are open, the same prompts can run on-prem. This repository contains
-a reference Python backend that calls Gemma 4 either through the Gemini API or through a
-self-hosted Vertex AI endpoint, with a single environment switch.
+from it. Because the weights are open, the same prompts can run on-prem.
+
+## AI tools used (disclosure)
+
+| Tool | What it did |
+|---|---|
+| **Lovable** (AI app builder) | Generated the entire application from our written specification: React UI, Postgres schema, server routes, tests. We iterated with follow-up prompts. |
+| **Claude Code** (Anthropic, model Claude Fable 5.1) | Wrote `SPEC.md` and this README from our idea, sent the prompts to Lovable, debugged the empty-transcript problem, and handled git. |
+| **Gemma 4** (`gemma-4-26b-a4b-it`, open weights, Gemini API) | Runtime model inside the product: task extraction, safety flags, translation, brief script. |
+| **ElevenLabs Scribe v1** and **Multilingual v2** | Runtime speech-to-text and text-to-speech inside the product. |
+
+No image generators were used.
+
+## Work timeline (disclosure)
+
+- **Built during the event (30 Oct 2026, from 14:00):** the idea decision, `SPEC.md`, the entire
+  ShiftBrief application in Lovable (every screen, table, server route and prompt), testing and
+  this README. The Lovable project was created at 14:27.
+- **Before the event (28–30 Oct, before 14:00):** the Python folder `app/` in this repository.
+  It is a small FastAPI warm-up we wrote while setting up accounts and API keys, to confirm that
+  Gemma 4 and ElevenLabs calls work from a laptop. **It is not part of the submitted product and
+  the live app does not use it.** We keep it in the repo because it shows how the same Gemma 4
+  prompts can run against a self-hosted Vertex AI endpoint instead of the Gemini API.
+
+## What we learned
+
+- Lovable Cloud can host server-side code as app routes, so we dropped the planned Python
+  backend and the tunnel entirely. One project, one owner, no moving URL.
+- Gemma 4 on the Gemini API has no structured-output mode. Asking for JSON in the prompt and
+  parsing from the first `{` to the last `}` with one retry was enough.
+- ElevenLabs Scribe handles German dictation with room numbers and ticket numbers well, and
+  one Multilingual v2 voice covers German, Turkish and English output.
+- The hardest bug was not AI at all: Chrome had blocked the microphone for the site, so every
+  recording was silent and the transcript came back empty. We now show the recorded audio size in
+  the error toast so this is visible immediately.
 
 ## What is in this repository
 
 | Path | Purpose |
 |---|---|
 | `SPEC.md` | Full product specification: scope, personas, demo data, architecture, API contracts, Lovable prompt, Gemma prompts, risks |
-| `app/` | Reference FastAPI backend: `/analyze` (Gemma 4, text + image), `/speak` (ElevenLabs TTS), Vertex AI switch |
-| `Dockerfile`, `docker-compose.yml` | Run the reference backend in a container |
+| `app/` | Pre-event warm-up backend (see timeline above): `/analyze` (Gemma 4, text + image), `/speak` (ElevenLabs TTS), Vertex AI switch |
+| `Dockerfile`, `docker-compose.yml` | Run the warm-up backend in a container |
 
-The production app itself lives in the Lovable project and is deployed at the link above.
+The application source is managed in the Lovable project and deployed at the link above.
 
 ## Team
 
@@ -53,7 +85,7 @@ The production app itself lives in the Lovable project and is deployed at the li
 - **Peter Paul Kirschner** – [@petkir](https://github.com/petkir)
 - **Syed Alhaam Faridi**
 
-## Running the reference backend
+## Running the warm-up backend (optional, not part of the product)
 
 ```bash
 python -m venv .venv
