@@ -1,7 +1,7 @@
 # ShiftBrief – Voice Shift Handover
 
 **Live app:** https://shiftbrief.lovable.app
-**Demo video (2 min):** [ShiftBrief.mp4](https://github.com/hansczylok/ShiftBrief/blob/main/ShiftBrief.mp4)
+**Demo video (2 min):** [ShiftBrief videon Youtube Link]([https://www.youtube.com/watch?v=7bwSmLltAUM])
 
 A worker ending a shift dictates the handover. The next worker hears a 60-second personalized
 audio brief in their own language and gets a tappable checklist. Works for hospital wards,
