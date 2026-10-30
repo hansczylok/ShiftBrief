@@ -45,6 +45,23 @@ German in, Turkish or English out, with room numbers, names and ticket numbers k
 Gemma 4 is the core of the product: every task, safety flag, translation and spoken script comes
 from it. Because the weights are open, the same prompts can run on-prem.
 
+## Open source used
+
+ShiftBrief is built almost entirely on open source. Only the hosted AI services are proprietary.
+
+| Area | Open-source components (license) |
+|---|---|
+| AI model | **Gemma 4** `gemma-4-26b-a4b-it` (open weights, Gemma license). Does all extraction, safety flagging, translation and brief writing. Called via the Gemini API here, but the same prompts can run on-prem. |
+| UI | React 19, shadcn/ui on Radix UI primitives, Tailwind CSS 4, tw-animate-css, lucide-react, sonner, cmdk, vaul, embla-carousel, recharts, react-day-picker (all MIT) |
+| App framework | TanStack Start, TanStack Router, TanStack Query, Vite 8, Nitro (MIT) |
+| Forms and helpers | react-hook-form, zod, date-fns, class-variance-authority, clsx, tailwind-merge (MIT) |
+| Data | PostgreSQL (PostgreSQL License) on Supabase (Apache 2.0), supabase-js, postgres driver, Drizzle ORM and drizzle-kit (MIT) |
+| Tooling | TypeScript (Apache 2.0), ESLint, Prettier, Vitest, Testing Library, jsdom (MIT), Bun (MIT) |
+
+Not open source: ElevenLabs Scribe v1 and Multilingual v2 (hosted speech APIs), the Lovable
+platform that generated and hosts the app, and the Gemini API endpoint used to run Gemma 4.
+Exact versions are in [`lovable-app/package.json`](lovable-app/package.json).
+
 ## AI tools used (disclosure)
 
 | Tool | What it did |
