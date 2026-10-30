@@ -83,11 +83,15 @@ No image generators were used.
 
 | Path | Purpose |
 |---|---|
+| `lovable-app/` | **The application source** exported from the Lovable project: TanStack Start + React 19 + Tailwind, Drizzle migration for the four tables, the five server routes under `src/routes/api/public/`, Gemma 4 prompts in `src/server/prompts.ts`, Gemini call with fallbacks in `src/server/ai.ts`. Secrets are not included; the routes read them from the environment. |
+| `docs/screenshots/` | Screenshots of the live app |
+| `ShiftBrief.mp4` | 2-minute demo recording |
 | `SPEC.md` | Full product specification: scope, personas, demo data, architecture, API contracts, Lovable prompt, Gemma prompts, risks |
 | `app/` | Pre-event warm-up backend (see timeline above): `/analyze` (Gemma 4, text + image), `/speak` (ElevenLabs TTS), Vertex AI switch |
 | `Dockerfile`, `docker-compose.yml` | Run the warm-up backend in a container |
 
-The application source is managed in the Lovable project and deployed at the link above.
+The application is developed in the Lovable project and deployed at the link above; `lovable-app/`
+is a snapshot of its source exported after the last change on 30 Oct 2026.
 
 ## Team
 
