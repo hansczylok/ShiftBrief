@@ -19,3 +19,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+Name and wordmark
+
+The MIT license above covers the code and the documentation. The name
+"ShiftBrief" and the wordmark (also its inline copy in the app header and page
+titles, and where the screenshots show it) are not licensed under it:
+(c) 2026 Hans Czylok, all rights reserved. A fork may use the code, but not the
+name or the wordmark, and must not present itself as ShiftBrief.

@@ -128,4 +128,11 @@ environment, and apply `drizzle/migrations/0000_migration.sql` to a Supabase pro
 
 ## License
 
-MIT
+MIT, see [LICENSE](LICENSE).
+
+### Name and wordmark
+
+The MIT license covers the code and the documentation. The name "ShiftBrief" and the wordmark (also its
+inline copy in the app header and page titles, and where the screenshots show it) are not licensed under
+it: © 2026 Hans Czylok, all rights reserved. A fork may use the code, but not the name or the wordmark.
+The wordmark is rendered in `lovable-app/src/routes/__root.tsx`; the screenshots are in `docs/screenshots/`.
