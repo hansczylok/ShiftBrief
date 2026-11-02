@@ -99,12 +99,14 @@ No image generators were used.
 
 | Path | Purpose |
 |---|---|
-| `lovable-app/` | **The application source** exported from the Lovable project: TanStack Start + React 19 + Tailwind, Drizzle migration for the four tables, the five server routes under `src/routes/api/public/`, Gemma 4 prompts in `src/server/prompts.ts`, Gemini call with fallbacks in `src/server/ai.ts`. Secrets are not included; the routes read them from the environment. |
+| `lovable-app/` | **The application source**, a git subtree of the Lovable project: TanStack Start + React 19 + Tailwind, Drizzle migration for the four tables, the five server routes under `src/routes/api/public/`, Gemma 4 prompts in `src/server/prompts.ts`, Gemini call with fallbacks in `src/server/ai.ts`. Secrets are not included; the routes read them from the environment. |
 | `docs/screenshots/` | Screenshots of the live app |
 | `SPEC.md` | Full product specification: scope, personas, demo data, architecture, API contracts, Lovable prompt, Gemma prompts, risks |
 
-The application is developed in the Lovable project and deployed at the link above; `lovable-app/`
-is a snapshot of its source exported after the last change on 30 Oct 2026.
+The application is developed in the Lovable project and deployed at the link above. `lovable-app/`
+is a git subtree of that project's repository, pulled in after each change, so this folder always
+matches what runs under the live URL. Changes after the Hack Day (access code, cached audio, daily
+limits) are described in `lovable-app/AGENTS.md`.
 
 ## Team
 
