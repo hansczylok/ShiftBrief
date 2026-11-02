@@ -1,6 +1,8 @@
 # ShiftBrief – Voice Shift Handover
 
-**Live app:** https://shiftbrief.lovable.app
+**Live app:** https://shiftbrief.lovable.app. Listening to the demo briefs needs nothing; recording a
+new handover or generating a new brief asks for a demo access code, which protects the speech and
+model quotas. Ask the author for it.
 **Demo video (2 min):** [YouTube](https://www.youtube.com/watch?v=7bwSmLltAUM)
 
 A worker ending a shift dictates the handover. The next worker hears a 60-second personalized
@@ -126,8 +128,18 @@ bun install
 bun run dev
 ```
 
-Set `ELEVENLABS_API_KEY`, `GEMINI_API_KEY`, `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in the
-environment, and apply `drizzle/migrations/0000_migration.sql` to a Supabase project.
+Set these in the environment:
+
+| Variable | Purpose |
+|---|---|
+| `ELEVENLABS_API_KEY` | Speech-to-text and text-to-speech |
+| `GEMINI_API_KEY` | Gemma 4 via the Gemini API |
+| `DEMO_ACCESS_CODE` | Any string; the app asks for it before recording or generating a brief |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Database access from the browser |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server routes: audio cache in storage and the daily usage counters |
+
+Apply the migrations in `drizzle/migrations/` to a Supabase project and create a private storage
+bucket named `brief-audio`.
 
 ## License
 
