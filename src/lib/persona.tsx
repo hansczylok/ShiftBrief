@@ -18,7 +18,7 @@ type Ctx = { personas: Persona[]; persona: Persona | null; setPersonaId: (id: st
 const PersonaCtx = createContext<Ctx>({ personas: [], persona: null, setPersonaId: () => {} });
 
 export function PersonaProvider({ children }: { children: ReactNode }) {
-  const [id, setId] = useState<string>("anna");
+  const [id, setId] = useState<string>("mehmet");
   useEffect(() => {
     const saved = localStorage.getItem(KEY);
     if (saved) setId(saved);

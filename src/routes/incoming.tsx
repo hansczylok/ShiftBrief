@@ -19,14 +19,17 @@ export const Route = createFileRoute("/incoming")({
 function Incoming() {
   const { persona, personas } = usePersona();
   const team = persona?.team;
+  // Incoming is the inbox of the selected person: handovers from the rest of the team,
+  // never your own recordings.
   const { data, isLoading } = useQuery({
-    queryKey: ["handovers", team],
+    queryKey: ["handovers", team, persona?.id],
     enabled: !!team,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("handovers")
         .select("*")
         .eq("team", team!)
+        .neq("author_id", persona!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -42,7 +45,7 @@ function Incoming() {
       {isLoading && <LoadingLine text="Loading handovers…" />}
       {data?.length === 0 && (
         <div className="rounded-2xl border border-dashed bg-card p-6 text-center text-sm text-muted-foreground">
-          No handovers for {team} yet.{" "}
+          No handovers for {persona?.name ?? "you"} on {team} yet.{" "}
           <Link to="/record" className="font-medium text-primary">
             Record one
           </Link>
@@ -73,7 +76,8 @@ function Incoming() {
             </div>
             <p className="mt-3 line-clamp-3 text-sm">{h.summary}</p>
             <div className="mt-3 text-xs font-medium text-muted-foreground">
-              {nTasks} tasks · <span className={nFlags ? "text-safety" : ""}>{nFlags} safety flags</span>
+              {nTasks} tasks ·{" "}
+              <span className={nFlags ? "text-safety" : ""}>{nFlags} safety flags</span>
             </div>
           </Link>
         );
