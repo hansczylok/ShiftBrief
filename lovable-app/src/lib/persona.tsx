@@ -4,6 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type Persona = { id: string; name: string; role: string; team: string; language: string };
 
+// Human-readable language name for a persona's ISO code, e.g. "de" -> "German".
+export function languageName(code: string): string {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "language" }).of(code) ?? code.toUpperCase();
+  } catch {
+    return code.toUpperCase();
+  }
+}
+
 const KEY = "shiftbrief.persona";
 type Ctx = { personas: Persona[]; persona: Persona | null; setPersonaId: (id: string) => void };
 const PersonaCtx = createContext<Ctx>({ personas: [], persona: null, setPersonaId: () => {} });
@@ -27,7 +36,11 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(KEY, v);
   };
   const persona = personas.find((p) => p.id === id) ?? personas[0] ?? null;
-  return <PersonaCtx.Provider value={{ personas, persona, setPersonaId }}>{children}</PersonaCtx.Provider>;
+  return (
+    <PersonaCtx.Provider value={{ personas, persona, setPersonaId }}>
+      {children}
+    </PersonaCtx.Provider>
+  );
 }
 
 export const usePersona = () => useContext(PersonaCtx);
@@ -43,7 +56,13 @@ export async function apiJson<T>(path: string, body: unknown): Promise<T> {
   return readJson<T>(res);
 }
 
-export type Task = { id: string; title: string; priority: "high" | "medium" | "low"; due: string | null; location: string | null };
+export type Task = {
+  id: string;
+  title: string;
+  priority: "high" | "medium" | "low";
+  due: string | null;
+  location: string | null;
+};
 export type SafetyFlag = { text: string; severity: string };
 export type HandoverData = {
   summary: string;
