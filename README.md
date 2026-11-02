@@ -102,6 +102,7 @@ No image generators were used.
 | `lovable-app/` | **The application source**, a git subtree of the Lovable project: TanStack Start + React 19 + Tailwind, Drizzle migration for the four tables, the five server routes under `src/routes/api/public/`, Gemma 4 prompts in `src/server/prompts.ts`, Gemini call with fallbacks in `src/server/ai.ts`. Secrets are not included; the routes read them from the environment. |
 | `docs/screenshots/` | Screenshots of the live app |
 | `SPEC.md` | Full product specification: scope, personas, demo data, architecture, API contracts, Lovable prompt, Gemma prompts, risks |
+| `PLAN.md` | What changed after the Hack Day and what is planned but not built |
 
 The application is developed in the Lovable project and deployed at the link above. `lovable-app/`
 is a git subtree of that project's repository, pulled in after each change, so this folder always
