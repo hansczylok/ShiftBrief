@@ -120,7 +120,7 @@ limits) are described in `lovable-app/AGENTS.md`.
 
 ## Running the app locally
 
-The app is a Lovable project. To run the exported source yourself:
+The app is a Lovable project. To run the source yourself (npm works too: `npm install`, `npm run dev`):
 
 ```bash
 cd lovable-app
@@ -128,7 +128,9 @@ bun install
 bun run dev
 ```
 
-Set these in the environment:
+The committed `lovable-app/.env` points the browser at the demo database (publishable key only).
+To use your own Supabase project, replace the `VITE_SUPABASE_*` values there. Then set these in the
+environment of the dev server:
 
 | Variable | Purpose |
 |---|---|
@@ -138,8 +140,9 @@ Set these in the environment:
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Database access from the browser |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server routes: audio cache in storage and the daily usage counters |
 
-Apply the migrations in `drizzle/migrations/` to a Supabase project and create a private storage
-bucket named `brief-audio`.
+Apply the migrations in `drizzle/migrations/` to your Supabase project and create a private storage
+bucket named `brief-audio`. Without `SUPABASE_SERVICE_ROLE_KEY` the pages load, but recording and
+briefs fail with a clear "Missing Supabase environment variable" error.
 
 ## License
 
