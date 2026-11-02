@@ -6,7 +6,11 @@ export const Route = createFileRoute("/api/public/health")({
     handlers: {
       OPTIONS: async () => preflight(),
       GET: async () =>
-        json({ elevenlabs: !!process.env['ELEVENLABS_API_KEY'], gemini: !!process.env['GEMINI_API_KEY'] }),
+        json({
+          elevenlabs: !!process.env["ELEVENLABS_API_KEY"],
+          gemini: !!process.env["GEMINI_API_KEY"],
+          demoCode: !!process.env["DEMO_ACCESS_CODE"],
+        }),
     },
   },
 });

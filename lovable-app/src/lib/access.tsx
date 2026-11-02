@@ -68,6 +68,8 @@ export function AccessCodeDialog() {
         <p className="text-sm text-muted-foreground">{prompt.message}</p>
         <input
           autoFocus
+          type="password"
+          autoComplete="off"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className="h-12 w-full rounded-xl border bg-background px-3"
