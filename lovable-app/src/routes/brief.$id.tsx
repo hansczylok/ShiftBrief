@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AlertTriangle, ArrowLeft, Pause, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { apiJson, usePersona, type HandoverData, type Task } from "@/lib/persona";
+import { apiJson, languageName, usePersona, type HandoverData, type Task } from "@/lib/persona";
 import { LoadingLine, PriorityChip } from "@/components/PriorityChip";
 
 export const Route = createFileRoute("/brief/$id")({
@@ -52,23 +52,29 @@ function BriefPage() {
   // persona must not generate (and pay for) a brief that nobody on that team should hear.
   const wrongTeam = !!handover && !!persona && persona.team !== handover.team;
   const teamPersonas = personas.filter((p) => p.team === handover?.team);
+  // The author sees the handover as the other team member will hear it ("Anna → Mehmet")
+  // instead of getting a brief addressed to themselves.
+  const isAuthor = !!handover && !!persona && persona.id === handover.author_id;
+  const others = teamPersonas.filter((p) => p.id !== handover?.author_id);
+  const recipient =
+    !handover || !persona || wrongTeam ? null : isAuthor ? (others[0] ?? null) : persona;
 
   const { data: states = [] } = useQuery({
-    queryKey: ["task_states", id, persona?.id],
-    enabled: !!persona,
+    queryKey: ["task_states", id, recipient?.id],
+    enabled: !!recipient,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("task_states")
         .select("*")
         .eq("handover_id", id)
-        .eq("recipient_id", persona!.id);
+        .eq("recipient_id", recipient!.id);
       if (error) throw error;
       return data;
     },
   });
 
   useEffect(() => {
-    if (!handover || !persona || persona.team !== handover.team) return;
+    if (!handover || !recipient) return;
     let cancelled = false;
     setBrief(null);
     setAudioUrl(null);
@@ -78,13 +84,13 @@ function BriefPage() {
           .from("briefs")
           .select("*")
           .eq("handover_id", id)
-          .eq("recipient_id", persona.id)
+          .eq("recipient_id", recipient.id)
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
         let b = cached as unknown as Brief | null;
         if (!b) {
-          setStage(`Writing ${persona.name}'s brief…`);
+          setStage(`Writing ${recipient.name}'s brief…`);
           const out = await apiJson<{
             script: string;
             language: string;
@@ -92,13 +98,13 @@ function BriefPage() {
           }>("/api/public/brief", {
             handover: { summary: handover.summary, ...hd },
             author: { name: author?.name ?? handover.author_id, role: author?.role ?? "" },
-            recipient: { name: persona.name, role: persona.role, language: persona.language },
+            recipient: { name: recipient.name, role: recipient.role, language: recipient.language },
           });
           const { data: ins, error } = await supabase
             .from("briefs")
             .insert({
               handover_id: id,
-              recipient_id: persona.id,
+              recipient_id: recipient.id,
               language: out.language,
               script: out.script,
               checklist: out.checklist,
@@ -126,19 +132,19 @@ function BriefPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handover?.id, persona?.id]);
+  }, [handover?.id, recipient?.id]);
 
   const toggleTask = async (taskId: string, done: boolean) => {
-    if (!persona) return;
+    if (!recipient || isAuthor) return;
     const { error } = await supabase.from("task_states").upsert({
       handover_id: id,
       task_id: taskId,
-      recipient_id: persona.id,
+      recipient_id: recipient.id,
       done,
       done_at: done ? new Date().toISOString() : null,
     });
     if (error) toast.error(error.message);
-    qc.invalidateQueries({ queryKey: ["task_states", id, persona.id] });
+    qc.invalidateQueries({ queryKey: ["task_states", id, recipient.id] });
   };
 
   const tasks: Task[] = hd.tasks ?? [];
@@ -155,13 +161,28 @@ function BriefPage() {
       {handover && (
         <div>
           <h1 className="text-2xl font-bold">
-            {author?.name ?? handover.author_id} → {persona?.name}
+            {author?.name ?? handover.author_id} → {recipient?.name ?? handover.team}
           </h1>
-          <p className="text-sm text-muted-foreground">{handover.team}</p>
+          <p className="text-sm text-muted-foreground">
+            {handover.team}
+            {isAuthor && recipient && (
+              <>
+                {" "}
+                · your handover, {recipient.name} hears it in {languageName(recipient.language)}
+              </>
+            )}
+          </p>
         </div>
       )}
 
-      {wrongTeam ? (
+      {isAuthor && !recipient ? (
+        <div className="rounded-2xl border bg-muted p-4 text-sm">
+          <p className="font-medium">This is your handover for {handover.team}.</p>
+          <p className="mt-1 text-muted-foreground">
+            Choose a team member in the top bar to hear it as their brief.
+          </p>
+        </div>
+      ) : wrongTeam ? (
         <div className="rounded-2xl border bg-muted p-4 text-sm">
           <p className="font-medium">This handover is for {handover.team}.</p>
           <p className="mt-1 text-muted-foreground">
@@ -196,16 +217,18 @@ function BriefPage() {
           <div className="mb-2 flex items-center justify-between">
             <h2 className="font-semibold">Your brief</h2>
             <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-semibold uppercase text-accent-foreground">
-              {brief.language ?? persona?.language}
+              {brief.language ?? recipient?.language}
             </span>
           </div>
           <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{brief.script}</p>
         </section>
       )}
 
-      {!wrongTeam && tasks.length > 0 && (
+      {recipient && tasks.length > 0 && (
         <section className="rounded-2xl border bg-card p-2 shadow-card">
-          <h2 className="px-2 pt-2 font-semibold">Checklist</h2>
+          <h2 className="px-2 pt-2 font-semibold">
+            {isAuthor ? `${recipient.name}'s checklist` : "Checklist"}
+          </h2>
           {tasks.map((t) => {
             const done = !!states.find((s) => s.task_id === t.id)?.done;
             return (
@@ -216,6 +239,7 @@ function BriefPage() {
                 <input
                   type="checkbox"
                   checked={done}
+                  disabled={isAuthor}
                   onChange={(e) => toggleTask(t.id, e.target.checked)}
                   className="mt-0.5 h-6 w-6 shrink-0 accent-[var(--primary)]"
                 />
