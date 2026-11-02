@@ -13,7 +13,7 @@ import { Inbox, Mic } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { PersonaProvider, usePersona } from "@/lib/persona";
+import { PersonaProvider, languageName, usePersona } from "@/lib/persona";
 import { Toaster } from "@/components/ui/sonner";
 import { AccessCodeDialog } from "@/lib/access";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,10 @@ function NotFoundComponent() {
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <div className="mt-6">
-          <Link to="/incoming" className="inline-flex h-12 items-center rounded-xl bg-primary px-5 font-medium text-primary-foreground">
+          <Link
+            to="/incoming"
+            className="inline-flex h-12 items-center rounded-xl bg-primary px-5 font-medium text-primary-foreground"
+          >
             Go to Incoming
           </Link>
         </div>
@@ -44,7 +47,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold text-foreground">This page didn't load</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{error instanceof Error ? error.message : "Something went wrong."}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : "Something went wrong."}
+        </p>
         <button
           onClick={() => {
             router.invalidate();
@@ -65,14 +70,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "ShiftBrief — voice shift handovers" },
-      { name: "description", content: "Record a shift handover by voice; the next shift hears a translated brief." },
+      {
+        name: "description",
+        content: "Record a shift handover by voice; the next shift hears a translated brief.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -100,14 +111,25 @@ function RootShell({ children }: { children: ReactNode }) {
 function HealthDot() {
   const { data } = useQuery({
     queryKey: ["health"],
-    queryFn: async () => (await fetch("/api/public/health")).json() as Promise<{ elevenlabs: boolean; gemini: boolean }>,
+    queryFn: async () =>
+      (await fetch("/api/public/health")).json() as Promise<{
+        elevenlabs: boolean;
+        gemini: boolean;
+      }>,
     refetchInterval: 60000,
   });
   const ok = !!data?.elevenlabs && !!data?.gemini;
   return (
     <span
-      title={data ? `Voice: ${data.elevenlabs ? "ready" : "missing key"} · Gemma: ${data.gemini ? "ready" : "missing key"}` : "Checking…"}
-      className={cn("h-2.5 w-2.5 shrink-0 rounded-full", !data ? "bg-muted-foreground" : ok ? "bg-ok" : "bg-safety")}
+      title={
+        data
+          ? `Voice: ${data.elevenlabs ? "ready" : "missing key"} · Gemma: ${data.gemini ? "ready" : "missing key"}`
+          : "Checking…"
+      }
+      className={cn(
+        "h-2.5 w-2.5 shrink-0 rounded-full",
+        !data ? "bg-muted-foreground" : ok ? "bg-ok" : "bg-safety",
+      )}
     />
   );
 }
@@ -125,11 +147,11 @@ function TopBar() {
             aria-label="I am…"
             value={persona?.id ?? ""}
             onChange={(e) => setPersonaId(e.target.value)}
-            className="h-11 min-w-0 max-w-[220px] truncate rounded-xl border bg-background px-3 text-sm font-medium text-foreground"
+            className="h-11 min-w-0 max-w-[260px] truncate rounded-xl border bg-background px-3 text-sm font-medium text-foreground"
           >
             {personas.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name} · {p.team}
+                {p.name} · {p.team} · {languageName(p.language)}
               </option>
             ))}
           </select>
@@ -140,7 +162,8 @@ function TopBar() {
 }
 
 function BottomNav() {
-  const item = "flex h-16 flex-1 flex-col items-center justify-center gap-1 text-xs font-medium text-muted-foreground";
+  const item =
+    "flex h-16 flex-1 flex-col items-center justify-center gap-1 text-xs font-medium text-muted-foreground";
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-card">
       <div className="mx-auto flex max-w-xl">
