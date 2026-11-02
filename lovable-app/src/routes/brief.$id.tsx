@@ -13,13 +13,21 @@ export const Route = createFileRoute("/brief/$id")({
       { title: "Your brief · ShiftBrief" },
       { name: "description", content: "Listen to your translated shift brief and tick off tasks." },
       { property: "og:title", content: "Your brief · ShiftBrief" },
-      { property: "og:description", content: "Listen to your translated shift brief and tick off tasks." },
+      {
+        property: "og:description",
+        content: "Listen to your translated shift brief and tick off tasks.",
+      },
     ],
   }),
   component: BriefPage,
 });
 
-type Brief = { id: string; script: string; language: string | null; checklist: { id: string; title: string }[] };
+type Brief = {
+  id: string;
+  script: string;
+  language: string | null;
+  checklist: { id: string; title: string }[];
+};
 
 function BriefPage() {
   const { id } = Route.useParams();
@@ -40,6 +48,10 @@ function BriefPage() {
   });
   const author = personas.find((p) => p.id === handover?.author_id);
   const hd = (handover?.data ?? {}) as Partial<HandoverData>;
+  // A brief is only written for people on the handover's team; switching to another team's
+  // persona must not generate (and pay for) a brief that nobody on that team should hear.
+  const wrongTeam = !!handover && !!persona && persona.team !== handover.team;
+  const teamPersonas = personas.filter((p) => p.team === handover?.team);
 
   const { data: states = [] } = useQuery({
     queryKey: ["task_states", id, persona?.id],
@@ -56,7 +68,7 @@ function BriefPage() {
   });
 
   useEffect(() => {
-    if (!handover || !persona) return;
+    if (!handover || !persona || persona.team !== handover.team) return;
     let cancelled = false;
     setBrief(null);
     setAudioUrl(null);
@@ -73,17 +85,24 @@ function BriefPage() {
         let b = cached as unknown as Brief | null;
         if (!b) {
           setStage(`Writing ${persona.name}'s brief…`);
-          const out = await apiJson<{ script: string; language: string; checklist: Brief["checklist"] }>(
-            "/api/public/brief",
-            {
-              handover: { summary: handover.summary, ...hd },
-              author: { name: author?.name ?? handover.author_id, role: author?.role ?? "" },
-              recipient: { name: persona.name, role: persona.role, language: persona.language },
-            },
-          );
+          const out = await apiJson<{
+            script: string;
+            language: string;
+            checklist: Brief["checklist"];
+          }>("/api/public/brief", {
+            handover: { summary: handover.summary, ...hd },
+            author: { name: author?.name ?? handover.author_id, role: author?.role ?? "" },
+            recipient: { name: persona.name, role: persona.role, language: persona.language },
+          });
           const { data: ins, error } = await supabase
             .from("briefs")
-            .insert({ handover_id: id, recipient_id: persona.id, language: out.language, script: out.script, checklist: out.checklist })
+            .insert({
+              handover_id: id,
+              recipient_id: persona.id,
+              language: out.language,
+              script: out.script,
+              checklist: out.checklist,
+            })
             .select()
             .single();
           if (error) throw error;
@@ -92,7 +111,9 @@ function BriefPage() {
         if (cancelled) return;
         setBrief(b);
         setStage("Generating voice…");
-        const { url: audio } = await apiJson<{ url: string }>("/api/public/speak", { briefId: b.id });
+        const { url: audio } = await apiJson<{ url: string }>("/api/public/speak", {
+          briefId: b.id,
+        });
         if (cancelled) return;
         setAudioUrl(audio);
       } catch (e) {
@@ -125,7 +146,10 @@ function BriefPage() {
 
   return (
     <div className="space-y-4">
-      <Link to="/incoming" className="inline-flex h-12 items-center gap-1 text-sm font-medium text-muted-foreground">
+      <Link
+        to="/incoming"
+        className="inline-flex h-12 items-center gap-1 text-sm font-medium text-muted-foreground"
+      >
         <ArrowLeft className="h-4 w-4" /> Incoming
       </Link>
       {handover && (
@@ -137,13 +161,27 @@ function BriefPage() {
         </div>
       )}
 
-      <Player url={audioUrl} disabled={!audioUrl} />
-      {stage && <LoadingLine text={stage} />}
+      {wrongTeam ? (
+        <div className="rounded-2xl border bg-muted p-4 text-sm">
+          <p className="font-medium">This handover is for {handover.team}.</p>
+          <p className="mt-1 text-muted-foreground">
+            Choose {teamPersonas.map((p) => p.name).join(" or ")} in the top bar to hear the brief.
+          </p>
+        </div>
+      ) : (
+        <>
+          <Player url={audioUrl} disabled={!audioUrl} />
+          {stage && <LoadingLine text={stage} />}
+        </>
+      )}
 
       {(hd.safety_flags ?? []).length > 0 && (
         <div className="space-y-2">
           {hd.safety_flags!.map((f, i) => (
-            <div key={i} className="flex gap-3 rounded-2xl border-2 border-safety bg-safety-soft p-4">
+            <div
+              key={i}
+              className="flex gap-3 rounded-2xl border-2 border-safety bg-safety-soft p-4"
+            >
               <AlertTriangle className="h-5 w-5 shrink-0 text-safety" />
               <div className="text-sm">
                 <span className="font-semibold uppercase text-safety">{f.severity}</span> · {f.text}
@@ -165,13 +203,16 @@ function BriefPage() {
         </section>
       )}
 
-      {tasks.length > 0 && (
+      {!wrongTeam && tasks.length > 0 && (
         <section className="rounded-2xl border bg-card p-2 shadow-card">
           <h2 className="px-2 pt-2 font-semibold">Checklist</h2>
           {tasks.map((t) => {
             const done = !!states.find((s) => s.task_id === t.id)?.done;
             return (
-              <label key={t.id} className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl p-2 active:bg-muted">
+              <label
+                key={t.id}
+                className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl p-2 active:bg-muted"
+              >
                 <input
                   type="checkbox"
                   checked={done}
@@ -179,7 +220,9 @@ function BriefPage() {
                   className="mt-0.5 h-6 w-6 shrink-0 accent-[var(--primary)]"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className={done ? "text-muted-foreground line-through" : "font-medium"}>{titleFor(t)}</div>
+                  <div className={done ? "text-muted-foreground line-through" : "font-medium"}>
+                    {titleFor(t)}
+                  </div>
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <PriorityChip priority={t.priority} />
                     {t.due && <span>⏱ {t.due}</span>}
@@ -194,11 +237,16 @@ function BriefPage() {
 
       {handover && (
         <div>
-          <button onClick={() => setShowTranscript((v) => !v)} className="h-12 text-sm font-medium text-primary">
+          <button
+            onClick={() => setShowTranscript((v) => !v)}
+            className="h-12 text-sm font-medium text-primary"
+          >
             {showTranscript ? "Hide original transcript" : "Show original transcript"}
           </button>
           {showTranscript && (
-            <p className="whitespace-pre-wrap rounded-2xl bg-muted p-4 text-sm text-muted-foreground">{handover.transcript}</p>
+            <p className="whitespace-pre-wrap rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
+              {handover.transcript}
+            </p>
           )}
         </div>
       )}
@@ -226,9 +274,14 @@ function Player({ url, disabled }: { url: string | null; disabled: boolean }) {
         {playing ? <Pause className="h-7 w-7" /> : <Play className="ml-1 h-7 w-7" />}
       </button>
       <div className="flex-1">
-        <div className="text-sm font-medium">{disabled ? "Preparing audio…" : playing ? "Playing" : "Play brief"}</div>
+        <div className="text-sm font-medium">
+          {disabled ? "Preparing audio…" : playing ? "Playing" : "Play brief"}
+        </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-          <div className="h-full bg-primary transition-[width]" style={{ width: `${progress * 100}%` }} />
+          <div
+            className="h-full bg-primary transition-[width]"
+            style={{ width: `${progress * 100}%` }}
+          />
         </div>
       </div>
       {url && (
