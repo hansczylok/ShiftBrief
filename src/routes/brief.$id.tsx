@@ -83,40 +83,12 @@ function BriefPage() {
     setAudioUrl(null);
     (async () => {
       try {
-        const { data: cached } = await supabase
-          .from("briefs")
-          .select("*")
-          .eq("handover_id", id)
-          .eq("recipient_id", persona.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        let b = cached as unknown as Brief | null;
-        if (!b) {
-          setStage(`Writing ${persona.name}'s brief…`);
-          const out = await apiJson<{
-            script: string;
-            language: string;
-            checklist: Brief["checklist"];
-          }>("/api/public/brief", {
-            handover: { summary: handover.summary, ...hd },
-            author: { name: author?.name ?? handover.author_id, role: author?.role ?? "" },
-            recipient: { name: persona.name, role: persona.role, language: persona.language },
-          });
-          const { data: ins, error } = await supabase
-            .from("briefs")
-            .insert({
-              handover_id: id,
-              recipient_id: persona.id,
-              language: out.language,
-              script: out.script,
-              checklist: out.checklist,
-            })
-            .select()
-            .single();
-          if (error) throw error;
-          b = ins as unknown as Brief;
-        }
+        // The server returns the saved brief, or writes and saves it on first open.
+        setStage(`Preparing ${persona.name}'s brief…`);
+        const b = await apiJson<Brief>("/api/public/brief", {
+          handoverId: id,
+          recipientId: persona.id,
+        });
         if (cancelled) return;
         setBrief(b);
         setStage("Generating voice…");
