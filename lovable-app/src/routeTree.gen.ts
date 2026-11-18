@@ -16,6 +16,7 @@ import { Route as BriefIdRouteImport } from './routes/brief.$id'
 import { Route as ApiPublicBriefRouteImport } from './routes/api/public/brief'
 import { Route as ApiPublicHandoverRouteImport } from './routes/api/public/handover'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ApiPublicPublishRouteImport } from './routes/api/public/publish'
 import { Route as ApiPublicSpeakRouteImport } from './routes/api/public/speak'
 import { Route as ApiPublicTranscribeRouteImport } from './routes/api/public/transcribe'
 
@@ -54,6 +55,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPublishRoute = ApiPublicPublishRouteImport.update({
+  id: '/api/public/publish',
+  path: '/api/public/publish',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSpeakRoute = ApiPublicSpeakRouteImport.update({
   id: '/api/public/speak',
   path: '/api/public/speak',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/api/public/brief': typeof ApiPublicBriefRoute
   '/api/public/handover': typeof ApiPublicHandoverRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/publish': typeof ApiPublicPublishRoute
   '/api/public/speak': typeof ApiPublicSpeakRoute
   '/api/public/transcribe': typeof ApiPublicTranscribeRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/api/public/brief': typeof ApiPublicBriefRoute
   '/api/public/handover': typeof ApiPublicHandoverRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/publish': typeof ApiPublicPublishRoute
   '/api/public/speak': typeof ApiPublicSpeakRoute
   '/api/public/transcribe': typeof ApiPublicTranscribeRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/api/public/brief': typeof ApiPublicBriefRoute
   '/api/public/handover': typeof ApiPublicHandoverRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/publish': typeof ApiPublicPublishRoute
   '/api/public/speak': typeof ApiPublicSpeakRoute
   '/api/public/transcribe': typeof ApiPublicTranscribeRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/api/public/brief'
     | '/api/public/handover'
     | '/api/public/health'
+    | '/api/public/publish'
     | '/api/public/speak'
     | '/api/public/transcribe'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/api/public/brief'
     | '/api/public/handover'
     | '/api/public/health'
+    | '/api/public/publish'
     | '/api/public/speak'
     | '/api/public/transcribe'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/api/public/brief'
     | '/api/public/handover'
     | '/api/public/health'
+    | '/api/public/publish'
     | '/api/public/speak'
     | '/api/public/transcribe'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   ApiPublicBriefRoute: typeof ApiPublicBriefRoute
   ApiPublicHandoverRoute: typeof ApiPublicHandoverRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicPublishRoute: typeof ApiPublicPublishRoute
   ApiPublicSpeakRoute: typeof ApiPublicSpeakRoute
   ApiPublicTranscribeRoute: typeof ApiPublicTranscribeRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/publish': {
+      id: '/api/public/publish'
+      path: '/api/public/publish'
+      fullPath: '/api/public/publish'
+      preLoaderRoute: typeof ApiPublicPublishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/speak': {
       id: '/api/public/speak'
       path: '/api/public/speak'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicBriefRoute: ApiPublicBriefRoute,
   ApiPublicHandoverRoute: ApiPublicHandoverRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicPublishRoute: ApiPublicPublishRoute,
   ApiPublicSpeakRoute: ApiPublicSpeakRoute,
   ApiPublicTranscribeRoute: ApiPublicTranscribeRoute,
 }

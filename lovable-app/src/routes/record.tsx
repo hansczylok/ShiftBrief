@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, Mic, Plus, Square, Trash2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { apiJson, usePersona, type HandoverData, type Task } from "@/lib/persona";
 import { LoadingLine } from "@/components/PriorityChip";
 import { cn } from "@/lib/utils";
@@ -113,17 +112,20 @@ function RecordPage() {
   const publish = async () => {
     if (!persona || !result || !transcript) return;
     setStage("Publishing…");
-    const { error } = await supabase.from("handovers").insert({
-      author_id: persona.id,
-      team: persona.team,
-      transcript,
-      summary: result.summary,
-      source_language: result.source_language ?? lang,
-      data: result as never,
-      status: "published",
-    });
-    setStage(null);
-    if (error) { toast.error(error.message); return; }
+    try {
+      await apiJson("/api/public/publish", {
+        authorId: persona.id,
+        transcript,
+        summary: result.summary,
+        source_language: result.source_language ?? lang,
+        data: result,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+      return;
+    } finally {
+      setStage(null);
+    }
     toast.success(`Handover published to ${persona.team}`);
     navigate({ to: "/incoming" });
   };
