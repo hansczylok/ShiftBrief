@@ -12,6 +12,9 @@ the original specification are in [`SPEC.md`](SPEC.md); the running code is in
 - **Inbox semantics.** *Incoming* is the inbox of the selected person: handovers from the rest
   of the team, never their own recordings. Opening a handover as someone from another team, or
   as its author, shows a notice instead of generating a brief.
+- **Read-only browser.** The public database key can only read; publishing a handover and
+  saving a brief go through server routes that require the demo access code. Only ticking
+  tasks is still written from the browser.
 - **Persona menu** shows the language each person hears their brief in.
 - **Demo data.** One published demo handover per team (Ward 3B, Hotel Front Desk,
   Factory Line 2), each with tasks and safety flags.
@@ -35,8 +38,8 @@ handovers they recorded themselves.
 
 ### Accounts and team-scoped data access
 
-The database still has the Hack Day policies ("demo all"): anyone can read and write every
-table. Before any deployment with real shift data: Supabase Auth, personas bound to user
+The browser can no longer write handovers or briefs, but every table is still readable by
+anyone, across all teams. Before any deployment with real shift data: Supabase Auth, personas bound to user
 accounts, row-level policies per team, and the demo access code replaced by real sessions.
 
 ### Demo data in both directions

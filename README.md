@@ -128,7 +128,8 @@ bun install
 bun run dev
 ```
 
-The committed `lovable-app/.env` points the browser at the demo database (publishable key only).
+The committed `lovable-app/.env` points the browser at the demo database (publishable key only; with it the browser can read,
+but writes go through the server routes).
 To use your own Supabase project, replace the `VITE_SUPABASE_*` values there. Then set these in the
 environment of the dev server:
 
